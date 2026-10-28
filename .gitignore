@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+.DS_Store
+reports/*
+!reports/.gitkeep
+logs/*
+!logs/.gitkeep
+local_checks/

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Отчет по диалогу с клиентом</title>
+  <style>
+    @page {
+      size: A4; margin: 18mm 18mm 20mm;
+      @bottom-left { content: "VPf10 / AI-автоматизация"; font: 8pt sans-serif; color: #687586; }
+      @bottom-right { content: "Страница " counter(page) " из " counter(pages); font: 8pt sans-serif; color: #687586; }
+    }
+    * { box-sizing: border-box; }
+    body { font-family: "DejaVu Sans", "Arial", sans-serif; color: #223146; font-size: 10pt; line-height: 1.5; }
+    .eyebrow { font-size: 8pt; letter-spacing: 1.3px; color: #087f8c; font-weight: bold; }
+    h1 { font-size: 25pt; line-height: 1.15; margin: 8pt 0 9pt; letter-spacing: -0.5px; }
+    .meta { color: #687586; font-size: 8pt; margin-bottom: 19pt; }
+    .summary { padding: 13pt 15pt; background: #edf5f7; border-left: 4pt solid #087f8c; margin: 0 0 18pt; }
+    .summary .label { color: #087f8c; font-size: 8pt; font-weight: bold; margin-bottom: 4pt; }
+    p { margin: 0 0 7pt; overflow-wrap: anywhere; }
+    h2 { font-size: 12pt; margin: 17pt 0 8pt; color: #163e53; break-after: avoid; }
+    .number { color: #087f8c; margin-right: 7pt; }
+    table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+    th, td { text-align: left; vertical-align: top; padding: 7pt 9pt; border-bottom: 1px solid #dce4eb; overflow-wrap: anywhere; }
+    th { color: #526377; font-size: 8pt; background: #f3f6f9; }
+    tr { break-inside: avoid; }
+    .details td:first-child { width: 27%; color: #687586; }
+    ul, ol { margin: 4pt 0; padding-left: 17pt; }
+    li { margin-bottom: 5pt; overflow-wrap: anywhere; }
+    .muted { color: #687586; }
+    .note { margin-top: 18pt; padding-top: 8pt; border-top: 1px solid #dce4eb; color: #687586; font-size: 8pt; }
+    .step { margin-bottom: 9pt; padding-left: 10pt; border-left: 2pt solid #dce4eb; break-inside: avoid; }
+    .step-meta { color: #687586; font-size: 8pt; }
+    .badge { font-weight: bold; color: #087f8c; }
+    .steps-section { break-inside: avoid; }
+  </style>
+</head>
+<body>
+  <div class="eyebrow">ОТЧЕТ ПО ДИАЛОГУ С КЛИЕНТОМ</div>
+  <h1>{{ report.topic }}</h1>
+  <div class="meta">Сформирован: {{ generated_at }}<br>Номер отчета: {{ report_id }}</div>
+  <div class="summary">
+    <div class="label">ОСНОВНОЙ ЗАПРОС</div>
+    <p>{{ report.main_request }}</p>
+  </div>
+  <h2><span class="number">01</span>Контекст разговора</h2>
+  <table class="details">
+    <tr><td>Клиент</td><td>{{ report.client_name or "Не указано" }}</td></tr>
+    <tr><td>Тон разговора*</td><td>{{ mood_label }}</td></tr>
+    <tr><td>Желаемый срок</td><td>{{ report.deadline or "Не указан" }}</td></tr>
+    <tr><td>Бюджет</td><td>{{ report.budget or "Не указан" }}</td></tr>
+  </table>
+  <h2><span class="number">02</span>Основные пожелания</h2>
+  {% if report.requirements %}
+  <ul>{% for item in report.requirements %}<li>{{ item }}</li>{% endfor %}</ul>
+  {% else %}<p class="muted">Явные пожелания не указаны.</p>{% endif %}
+  <div class="steps-section">
+  <h2><span class="number">03</span>Следующие шаги</h2>
+  {% for step in report.next_steps %}
+  <div class="step">
+    <p>{{ loop.index }}. {{ step.action }}</p>
+    <div class="step-meta"><span class="badge">{{ "Согласовано" if step.status == "agreed" else "Предложено" }}</span>
+      · Ответственный: {{ step.owner or "Не указан" }} · Срок: {{ step.deadline or "Не указан" }}</div>
+  </div>
+  {% else %}<p class="muted">Следующие шаги в диалоге не указаны.</p>{% endfor %}
+  </div>
+  <h2><span class="number">04</span>Что нужно уточнить</h2>
+  {% if report.open_questions %}
+  <ul>{% for item in report.open_questions %}<li>{{ item }}</li>{% endfor %}</ul>
+  {% else %}<p class="muted">По тексту диалога дополнительные вопросы не выделены.</p>{% endif %}
+  <div class="note">* Тон разговора оценен ИИ приблизительно. Отчет составлен автоматически по исходному тексту;
+    перед использованием проверьте факты и договоренности.</div>
+</body>
+</html>
